@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYMEEE</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<style>
+body{background:radial-gradient(circle at 20% 0,#3b0a4d,#12051c 55%,#07020d);color:#f3e8ff;min-height:100vh;font-family:system-ui,sans-serif;padding-bottom:56px}
+.glass{background:rgba(255,255,255,.07);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.grad{background:linear-gradient(90deg,#ff4ecd,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px #ff4ecd)}
+.logo-big{font-family:Audiowide,Orbitron,system-ui,sans-serif;font-size:clamp(48px,16vw,110px);letter-spacing:.06em;display:flex}.logo-big span{opacity:0;transform:translateY(30px) scale(.8);animation:pop .6s forwards}.l1{color:#fff;text-shadow:0 0 18px #ffffff66}.l2{background:linear-gradient(90deg,#ff4ecd,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px #ff4ecd)}.tag{margin-top:14px;opacity:0;animation:pop .8s 1.1s forwards;letter-spacing:.3em;color:#e9d5ff;font-size:13px}@keyframes pop{to{opacity:1;transform:none}}
+#logo{font-family:Audiowide,system-ui,sans-serif}
+.light body{background:linear-gradient(#fdf4ff,#fae8ff);color:#2a0a3d}.light .glass{background:rgba(255,255,255,.75);border-color:#e9d5ff}.light input,.light textarea,.light select{background:#fff;color:#2a0a3d;border-color:#d8b4fe}.light .opt{background:#fff;border-color:#e9d5ff;color:#2a0a3d}.light .opt.sel{color:#fff}.light .btn.alt{background:#f3e8ff;color:#2a0a3d}.light .text-white{color:#2a0a3d!important}.light footer{background:linear-gradient(transparent,#fae8ff);color:#7e22ce}
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(18,5,28,.75);border-bottom:1px solid rgba(255,255,255,.08);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+#av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));font-weight:800;display:none;align-items:center;justify-content:center}
+#tab{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(18,5,28,.93);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.1);padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+#tab button{flex:1;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.55}#tab button i{font-style:normal;font-size:20px}#tab button.on{opacity:1;color:#f0abfc}
+.hero{display:flex;gap:12px;align-items:center;padding:18px;border-radius:22px;background:linear-gradient(135deg,var(--a1),var(--a2));box-shadow:0 12px 30px rgba(168,85,247,.35)}
+.stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px;text-align:center;font-size:12px}.stat b{display:block;font-size:20px}
+.chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.sec{font-weight:700;font-size:15px;margin:2px 2px 8px}
+.cc{flex:1;padding:10px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);font-weight:700}.cc.on{background:linear-gradient(90deg,var(--a1),var(--a2));border-color:transparent}
+.sc{padding:18px;border-radius:20px;color:#fff;cursor:pointer;min-height:130px;box-shadow:0 10px 24px rgba(0,0,0,.35);transition:.2s}.sc:active{transform:scale(.96)}
+.opn{display:inline-flex;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);align-items:center;justify-content:center;margin-right:10px;font-size:12px}
+.light header,.light #tab{background:rgba(255,255,255,.95)}.light .stat,.light .chip,.light .cc{background:#fff;border-color:#e9d5ff;color:#2a0a3d}.light .cc.on{color:#fff}
+:root{--a1:#ec4899;--a2:#8b5cf6}@keyframes fl{50%{transform:translateY(-12px)}}
+.btn{background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 6px 20px rgba(236,72,153,.4);transition:.2s;transform:perspective(400px) translateZ(0)}
+.btn:hover{transform:perspective(400px) translateZ(12px)}
+.btn.alt{background:rgba(255,255,255,.1);box-shadow:none}
+input,textarea,select{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 12px;width:100%;color:#fff;outline:none}
+select option{color:#000}
+.opt{display:block;width:100%;text-align:left;padding:12px;border-radius:14px;margin-top:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05)}
+.opt.sel{background:linear-gradient(90deg,#ec4899aa,#8b5cf6aa);border-color:#ff4ecd}
+.opt.ok{background:#16a34a88;border-color:#4ade80}.opt.no{background:#dc262688;border-color:#f87171}
+.tile{padding:22px;text-align:center;font-weight:800;font-size:1.2rem;cursor:pointer;transition:.25s}
+.tile:hover{transform:perspective(500px) rotateX(8deg) translateY(-4px)}
+.scr{display:none;max-width:760px;margin:0 auto;padding:16px}.scr.on{display:block}
+#intro{position:fixed;inset:0;background:#07020d;z-index:50;transition:opacity .8s}
+footer{text-align:center;font:italic 15px 'Dancing Script','Brush Script MT',cursive;color:#c084fcaa;padding:18px 8px 4px}
+.ring{transform:perspective(600px) rotateX(25deg);filter:drop-shadow(0 14px 10px rgba(236,72,153,.5))}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:40}
+</style></head><body>
+<div id="intro" class="flex flex-col items-center justify-center" style="background:radial-gradient(circle at 50% 40%,#3b0a4d,#07020d)"><div class="logo-big"><span class="l1">S</span><span class="l1" style="animation-delay:.15s">Y</span><span class="l1" style="animation-delay:.3s">M</span><span class="l2" style="animation-delay:.45s">E</span><span class="l2" style="animation-delay:.6s">E</span><span class="l2" style="animation-delay:.75s">E</span></div><div class="tag">Learn • Practice • Win</div><div class="text-xs opacity-50 mt-8">tap to skip</div></div><canvas id="cf"></canvas>
+<header><h1 id="logo" class="text-2xl font-black tracking-widest cursor-pointer select-none"><span class="text-white">SYM</span><span class="grad">EEE</span></h1><button id="av" onclick="openSt()"></button></header>
+
+
+<main>
+<section id="login" class="scr"><div class="glass p-6 space-y-3">
+<div class="flex gap-2"><button class="btn flex-1" id="t1" onclick="tab(1)">👦 Student</button><button class="btn alt flex-1" id="t2" onclick="tab(2)">🔒 Admin</button></div>
+<div id="p1" class="space-y-3"><h2 class="text-xl font-bold">👋 Student Login</h2>
+<input id="nm" placeholder="Your Name"><select id="lc"><option>9th</option><option>10th</option><option>11th</option><option>12th</option></select>
+<input id="rl" placeholder="Roll No"><button class="btn w-full" onclick="doLogin()">Login →</button><button class="btn alt w-full" onclick="guest()">Guest ban ke dekho</button></div>
+<div id="p2" class="space-y-3 hidden"><h2 class="text-xl font-bold">Admin Login</h2>
+<input id="lp" type="password" placeholder="Admin Password"><button class="btn w-full" onclick="adminLogin('lp')">Login with Password</button>
+<div class="text-center text-xs opacity-60">— ya email se —</div>
+<input id="le" type="email" placeholder="Admin Email"><div class="flex gap-2"><button class="btn alt flex-1" onclick="adminOtp()">Send Code</button><input id="lk" placeholder="Code" class="flex-1"><button class="btn flex-1" onclick="adminVerify()">Go</button></div><div id="lm" class="text-xs"></div></div></div></section>
+
+<section id="cls" class="scr"><div id="dash"></div><div class="hidden" id="clsG"></div></section>
+<section id="sub" class="scr"><h2 class="text-xl font-bold mb-3">Select Subject</h2><div class="grid grid-cols-1 gap-3" id="subG"></div><button class="btn alt mt-4" onclick="show('cls')">← Back</button></section>
+<section id="tl" class="scr"><h2 class="text-xl font-bold mb-1" id="tlh"></h2><label class="text-sm block mb-3"><input type="checkbox" id="shf" style="width:auto;margin-right:6px">🔀 Shuffle questions &amp; options</label><div id="tlL" class="space-y-3"></div><button class="btn alt mt-4" onclick="show('cls')">← Back</button></section>
+
+<section id="qz" class="scr"><div class="glass p-5"><div class="h-1.5 bg-white/10 rounded mb-3"><div id="qpb" class="h-1.5 rounded" style="background:linear-gradient(90deg,var(--a1),var(--a2));width:0;transition:.3s"></div></div>
+<div class="flex justify-between items-center text-sm mb-2"><button onclick="leaveQ()">✕</button><span id="qn"></span><button id="bm" onclick="bmk()">☆</button><button id="fb" onclick="S.fl[S.i]=!S.fl[S.i];draw()">🚩</button><span id="tm" class="font-bold text-pink-300"></span></div>
+<h3 id="qt" class="text-lg font-semibold"></h3><div id="qo"></div><div id="pal" class="flex flex-wrap gap-1 mt-4"></div><div class="flex gap-2 mt-3 text-sm"><button class="btn alt flex-1" style="padding:8px" onclick="ll5050()">✂️ 50:50</button><button class="btn alt flex-1" style="padding:8px" onclick="llTime()">⏳ +30s</button></div>
+<div class="flex gap-2 mt-5"><button class="btn alt flex-1" onclick="nav(-1)">◀ Prev</button><button class="btn flex-1" id="nx" onclick="nav(1)">Next ▶</button></div></div></section>
+
+<section id="rs" class="scr"><div class="glass p-5 text-center">
+<h2 class="text-2xl font-black"><span class="text-white">SYM</span><span class="grad">EEE</span> Result</h2>
+<p id="rinfo" class="text-sm opacity-80 mt-1"></p><div id="gl" style="height:240px;touch-action:pan-y" class="mt-2"></div><div id="gleg" class="text-sm mb-2"></div>
+<div class="grid grid-cols-2 gap-2 items-center mt-3">
+<div class="ring"><canvas id="dc"></canvas></div>
+<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff22" stroke-width="12"/><circle id="pc" cx="60" cy="60" r="50" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:1.5s"/><defs><linearGradient id="g"><stop offset="0" stop-color="#ff4ecd"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><text id="pt" x="60" y="68" text-anchor="middle" fill="#fff" font-size="24" font-weight="800"></text></svg></div></div>
+<div id="sc" class="text-xl font-bold mt-3"></div><div id="vd" class="text-lg"></div>
+<h3 class="text-left font-bold mt-4 mb-2">🔑 Answer Key</h3><div id="ak" class="text-left space-y-2 text-sm"></div>
+<div class="grid grid-cols-2 gap-2 mt-4"><button class="btn alt" onclick="retry()">🔁 Retry</button><button class="btn alt" onclick="retryWrong()">❌ Wrong Revision</button><button class="btn alt" onclick="share()">📤 Share</button><button class="btn alt" onclick="cert()">🎓 Certificate</button><button class="btn col-span-2" onclick="show('cls')">Home</button></div></div></section>
+
+<section id="hs" class="scr"><div class="glass p-5"><h2 class="text-xl font-bold mb-2">📊 My Progress</h2><div id="hsum" class="text-sm opacity-80 mb-3"></div><canvas id="hc" height="160"></canvas><h3 class="font-bold mt-4 mb-2">📅 Last 7 Days</h3><canvas id="wc" height="140"></canvas><h3 class="font-bold mt-4 mb-2">📚 Subject Accuracy</h3><div id="sbj" class="space-y-2 text-sm"></div><h3 class="font-bold mt-4 mb-2">🏆 Leaderboard (is device pe)</h3><div id="lb" class="space-y-1 text-sm mb-4"></div><h3 class="font-bold mb-2">Past Tests</h3><div id="hl" class="space-y-2 text-sm"></div><button class="btn alt w-full mt-3" onclick="if(confirm('History clear?')){sv('sy_hist',[]);showHist()}">Clear History</button></div></section>
+
+<section id="wel" class="scr text-center" style="padding-top:30px"><div class="mx-auto w-36 h-36 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);box-shadow:0 0 60px #ec4899aa;animation:fl 3s ease-in-out infinite"><svg width="72" height="72" viewBox="0 0 24 24" fill="#fff"><path d="M2 12l20-9-7 19-3-8-10-2z"/></svg></div>
+<h2 class="text-3xl font-black mt-8"><span class="text-white">SYM</span><span class="grad">EEE</span></h2><div id="wt" class="text-2xl font-bold mt-1"></div><p id="wd" class="opacity-70 mt-2 h-12 px-6"></p>
+<div id="wdots" class="flex justify-center gap-2 mt-4"></div><button class="btn w-full mt-10" onclick="show('login')">Start Learning</button></section>
+<section id="st" class="scr"></section><section id="bk" class="scr"></section><section id="sp" class="scr"></section>
+<section id="al" class="scr"><div class="glass p-6 space-y-3"><h2 class="font-bold">🔒 Admin Login</h2>
+<input id="ap" type="password" placeholder="Password"><button class="btn w-full" onclick="adminLogin()">Enter</button>
+<button class="btn alt w-full" onclick="show('login')">Back</button></div></section>
+
+<section id="ad" class="scr" style="max-width:900px"><div class="glass p-4 mb-3"><h2 class="font-bold">Admin Panel - <span class="text-white">SYM</span><span class="grad">EEE</span> | Managed by Khushbu (Founder)</h2></div>
+<div class="glass p-4 space-y-2"><div class="grid grid-cols-2 gap-2"><select id="ac"><option>9th</option><option>10th</option><option>11th</option><option>12th</option></select><select id="as"><option>Chemistry</option><option>Maths</option><option>Science</option></select></div>
+<input id="at" placeholder="Quiz Title"><textarea id="ax" rows="10" placeholder="Q: Question? A) opt1 B) opt2* C) opt3 D) opt4 Ans: B Exp: reason (optional)&#10;(100 Q paste kar sakte ho)"></textarea>
+<div class="flex gap-2"><button class="btn flex-1" onclick="makeQuiz()" id="qb">QUIZ BANAO</button><button class="btn alt" onclick="clearForm()">Clear</button></div></div>
+<div class="glass p-4 mt-3"><div class="flex flex-wrap gap-2 mb-3"><button class="btn alt" onclick="exp()">Export JSON</button><label class="btn alt cursor-pointer">Import JSON<input type="file" accept=".json" class="hidden" onchange="imp(event)"></label><button class="btn alt" onclick="csv()">📊 Results CSV</button><button class="btn alt" onclick="show('cls')">Student View</button></div><div id="adL" class="space-y-2"></div></div>
+<div class="glass p-4 mt-3 space-y-2"><h3 class="font-bold">☁️ Cloud Sync (Supabase)</h3><p class="text-xs opacity-70">Sirf allowed admin email se. Table: symeee_quizzes</p>
+<input id="se" type="email" placeholder="Admin email"><div class="flex gap-2"><button class="btn alt flex-1" onclick="sbSend()">Send Code</button><input id="sk" placeholder="Code" class="flex-1"><button class="btn flex-1" onclick="sbVerify()">Verify</button></div>
+<div class="flex gap-2"><button class="btn flex-1" onclick="sbPush()">⬆ Push</button><button class="btn alt flex-1" onclick="sbPull(true)">⬇ Pull</button></div><div id="sm" class="text-xs"></div></div></section>
+</main>
+<nav id="tab" style="display:none"><button onclick="show('cls')"><i>🏠</i>Home</button><button onclick="quick()"><i>⚡</i>Practice</button><button onclick="showHist()"><i>📊</i>Progress</button><button onclick="showBm()"><i>⭐</i>Saved</button><button onclick="openSt()"><i>⚙️</i>Settings</button></nav>
+<footer>Created by Khushbu | Founder &amp; Educator - SYMEEE Classes</footer>
+
+<script>
+const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ADMINS=['rishabh8414p@gmail.com','riyasingh000090pl@gmail.com'];
+const SB_URL='https://aydjqwhepicvncwpirle.supabase.co',SB_KEY='sb_publishable_LJsaLbWc0nnDLWlVBw3dXQ_7IYN1GtH';
+let sb=null;try{sb=supabase.createClient(SB_URL,SB_KEY)}catch(e){}
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let S={user:ld('sy_user',null),cls:null,sub:null,quiz:null,ans:[],i:0,t:0,iv:null,edit:null,admin:false};
+const SUBS=['Chemistry','Maths','Science'];
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id==id));if(id=='ad')listAdmin();if(id=='cls')dash();if(id!='qz')clearInterval(S.iv);if(id=='wel')welcome();else clearInterval(WI);if(id!='rs')cancelAnimationFrame(GA);tabs(id);window.scrollTo(0,0)}
+const Q=()=>ld('sy_quizzes',[]);
+
+/* 3D intro */
+function endIntro(){const el=$('intro');if(!el)return;el.style.opacity=0;setTimeout(()=>el.remove(),800);show(S.user?'cls':'wel')}
+setTimeout(endIntro,3200);$('intro').onclick=endIntro;
+
+
+/* student flow */
+function doLogin(){const n=$('nm').value.trim(),rl=$('rl').value.trim();if(!n)return alert('Naam likho');S.user={name:n,cls:$('lc').value,roll:rl};sv('sy_user',S.user);show('cls')}
+$('clsG').innerHTML=['9th','10th','11th','12th'].map(c=>`<div class="glass tile" onclick="pickC('${c}')">${c}</div>`).join('');
+$('subG').innerHTML=SUBS.map(s=>`<div class="glass tile" onclick="pickS('${s}')">${s}</div>`).join('')+'<div class="glass tile" onclick="quick()">⚡ Quick Mix (10 random)</div>';
+function pickC(c){S.cls=c;show('sub')}
+function pickS(s){S.sub=s;const l=Q().filter(q=>q.cls==S.cls&&q.sub==s);$('shf').checked=CFG.shuf;$('tlh').textContent=`${S.cls} • ${s}`;
+$('tlL').innerHTML=l.length?l.map(q=>`<div class="glass p-4 flex justify-between items-center"><div><b>${E(q.title)}</b><div class="text-xs opacity-70">${q.qs.length} Q • ${q.qs.length} min</div></div><div class="flex gap-1"><button class="btn alt" style="padding:10px" onclick="startQ('${q.id}',0,1)">Practice</button><button class="btn" style="padding:10px" onclick="startQ('${q.id}')">Exam</button></div></div>`).join(''):'<div class="glass p-4">Abhi koi test nahi hai.</div>';show('tl')}
+function startQ(id,obj,prac){const q=JSON.parse(JSON.stringify(obj||Q().find(x=>x.id==id)));S.prac=!!prac;if(obj||$('shf').checked){q.qs.sort(()=>Math.random()-.5);q.qs.forEach(x=>{const c=x.o[x.a];x.o.sort(()=>Math.random()-.5);x.a=x.o.indexOf(c)})}S.quiz=q;S.fl=[];S.hid={};S.ll={f:1,t:1};S.ans=new Array(S.quiz.qs.length).fill(-1);S.i=0;S.t=CFG.tpq?S.quiz.qs.length*CFG.tpq:1e9;clearInterval(S.iv);
+S.iv=setInterval(()=>{S.t--;tick();if(S.t<=0)submit()},1000);show('qz');draw();tick()}
+function tick(){const m=Math.floor(S.t/60),s=S.t%60;$('tm').style.color=S.t<=30?'#f87171':'';$('tm').textContent=S.t>1e8?'⏱ ∞':`⏱ ${m}:${String(s).padStart(2,'0')}`;if(S.t%5==0)sv('sy_resume',{quiz:S.quiz,ans:S.ans,i:S.i,t:S.t,prac:S.prac,fl:S.fl,hid:S.hid,ll:S.ll})}
+function draw(){const q=S.quiz.qs[S.i];$('qn').textContent=`Q ${S.i+1}/${S.quiz.qs.length}`;$('qt').textContent=q.q;
+const L=S.prac&&S.ans[S.i]>=0;$('qo').innerHTML=q.o.map((o,k)=>`<button class="opt ${L?(k==q.a?'ok':S.ans[S.i]==k?'no':''):S.ans[S.i]==k?'sel':''}" onclick="pick(${k})" style="${(S.hid[S.i]||[]).includes(k)?'display:none':''}"><b class="opn">${'ABCD'[k]}</b>${E(o)}</button>`).join('');
+if(L&&q.ex)$('qo').innerHTML+=`<div class="text-sm mt-2 p-2 rounded-lg bg-white/10">💡 ${E(q.ex)}</div>`;$('bm').textContent=ld('sy_bm',[]).some(b=>b.q==q.q)?'⭐':'☆';$('qpb').style.width=((S.i+1)/S.quiz.qs.length*100)+'%';$('fb').style.opacity=S.fl[S.i]?1:.35;$('nx').textContent=S.i==S.quiz.qs.length-1?'Submit ✔':'Next ▶';$('pal').innerHTML=S.quiz.qs.map((_,k)=>`<button onclick="S.i=${k};draw()" class="w-8 h-8 rounded-lg text-xs ${k==S.i?'bg-pink-500':S.fl[k]?'bg-yellow-500':S.ans[k]>=0?'bg-purple-600':'bg-white/10'}">${k+1}</button>`).join('')}
+function nav(d){if(d>0&&S.i==S.quiz.qs.length-1){if(confirm('Submit karna hai?'))submit();return}S.i=Math.max(0,S.i+d);draw()}
+let dch=null;
+function submit(){clearInterval(S.iv);localStorage.removeItem('sy_resume');const qs=S.quiz.qs;let ok=0,bad=0;qs.forEach((q,i)=>{if(S.ans[i]==q.a)ok++;else if(S.ans[i]>=0)bad++});
+const sk=qs.length-ok-bad,pct=Math.round(ok/qs.length*100);sv('sy_hist',[...ld('sy_hist',[]),{name:S.user?.name||'Guest',cls:S.quiz.cls,sub:S.quiz.sub,title:S.quiz.title,ok,total:qs.length,pct,date:new Date().toLocaleDateString(),hide:CFG.hide}]);const gain=ok*10+(pct>=40?20:0)+(pct==100?50:0),P=prof(),td=new Date().toDateString();if(P.last!=td){P.streak=P.last==new Date(Date.now()-864e5).toDateString()?P.streak+1:1;P.last=td}P.xp+=gain;P.n++;P.best=Math.max(P.best,pct);savep(P);S.res={ok,total:qs.length,pct};S.share=`SYMEEE ⭐ ${S.user?.name||'Guest'} ne ${S.quiz.title} me ${ok}/${qs.length} (${pct}%) score kiya!`;
+$('rinfo').textContent=`${S.user?.name||''} • ${S.quiz.cls} ${S.quiz.sub} • ${S.quiz.title}`;
+$('sc').textContent=`Score: ${ok}/${qs.length} (${pct}%)${CFG.neg?` • Net ${(ok-bad*.25).toFixed(2)}`:''}`;$('vd').textContent=pct>=40?'🎉 Pass! Great job!':'💪 Fail - Try again!';$('vd').textContent+=` ⭐ +${gain} XP`;
+$('ak').innerHTML=qs.map((q,i)=>{const g=S.ans[i]==q.a;return `<div class="glass p-3"><b>${i+1}. ${E(q.q)}</b><div class="${g?'text-green-300':'text-red-300'}">Your: ${S.ans[i]>=0?'ABCD'[S.ans[i]]+') '+E(q.o[S.ans[i]]):'Skipped'}</div><div class="text-green-300">Correct: ${'ABCD'[q.a]}) ${E(q.o[q.a])}</div>${q.ex?`<div class="opacity-80">💡 ${E(q.ex)}</div>`:''}<button class="text-xs opacity-70 mt-1" onclick="bmq(${i})">⭐ Save</button></div>`}).join('');
+show('rs');$('gleg').textContent=`🟢 Sahi ${ok}   🔴 Galat ${bad}   ⚪ Skip ${sk}  (ghumao 👆)`;try{globe(qs.map((q,i)=>S.ans[i]<0?2:S.ans[i]==q.a?0:1))}catch(e){}if(dch)dch.destroy();
+dch=new Chart($('dc'),{type:'doughnut',data:{labels:['Correct','Wrong','Skipped'],datasets:[{data:[ok,bad,sk],backgroundColor:['#a855f7','#ec4899','#475569'],borderWidth:0}]},options:{cutout:'62%',plugins:{legend:{labels:{color:'#fff',boxWidth:10}}}}});
+$('pt').textContent=pct+'%';$('pc').style.strokeDashoffset=314;setTimeout(()=>$('pc').style.strokeDashoffset=314-314*pct/100,100);
+if(pct>=40)confetti()}
+function confetti(){const c=$('cf'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const P=[...Array(140)].map(()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height/2,v:2+Math.random()*4,s:4+Math.random()*6,h:Math.random()*360,r:Math.random()*6}));let f=0;
+(function a(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.v;p.r+=.1;x.fillStyle=`hsl(${p.h},90%,60%)`;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillRect(0,0,p.s,p.s*.6);x.restore()});if(++f<260)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height)})()}
+
+/* v3: settings, welcome, globe */
+let CFG=Object.assign({sound:true,vib:true,shuf:false,auto:false,tpq:60,goal:10,hide:false,acc:'pink',fs:16,light:false,neg:false,rem:true,av:''},ld('sy_cfg',{}));
+const ACC={pink:['#ec4899','#8b5cf6'],blue:['#3b82f6','#06b6d4'],green:['#22c55e','#14b8a6'],orange:['#f97316','#ef4444']};
+function applyCfg(){const a=ACC[CFG.acc]||ACC.pink,r=document.documentElement.style;r.setProperty('--a1',a[0]);r.setProperty('--a2',a[1]);document.body.style.fontSize=CFG.fs+'px';document.documentElement.classList.toggle('light',!!CFG.light)}
+function setC(k,v){CFG[k]=v;sv('sy_cfg',CFG);applyCfg()}
+let WI;function welcome(){const W=[['Fast','Quiz seconds me shuru karo — 1 tap, 1 question.'],['Powerful','3D result globe, XP, streaks aur badges.'],['Free','Bilkul free. Practice karo aur top karo! 🚀']];let i=0;clearInterval(WI);
+const f=()=>{$('wt').innerHTML=`<span class="grad">${W[i][0]}</span>`;$('wd').textContent=W[i][1];$('wdots').innerHTML=W.map((_,k)=>`<i class="block w-2 h-2 rounded-full ${k==i?'bg-pink-500':'bg-white/30'}"></i>`).join('')};f();WI=setInterval(()=>{i=(i+1)%3;f()},2500)}
+let GA=0,GR=null;
+function globe(st){const el=$('gl');cancelAnimationFrame(GA);if(GR)GR.dispose();el.innerHTML='';const w=el.clientWidth||300,h=240;GR=new THREE.WebGLRenderer({antialias:true,alpha:true});GR.setSize(w,h);el.appendChild(GR.domElement);
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,w/h,.1,50);cam.position.z=6;const g=new THREE.Group();sc.add(g);
+g.add(new THREE.Mesh(new THREE.SphereGeometry(2,32,24),new THREE.MeshBasicMaterial({color:0x2a0a3d,transparent:true,opacity:.9})));
+g.add(new THREE.Mesh(new THREE.SphereGeometry(2.02,24,16),new THREE.MeshBasicMaterial({color:0xa855f7,wireframe:true,transparent:true,opacity:.25})));
+const C=[0x22c55e,0xef4444,0x64748b],n=st.length;
+st.forEach((v,i)=>{const y=1-(i+.5)*2/n,r=Math.sqrt(1-y*y),t=i*2.399963,m=new THREE.Mesh(new THREE.SphereGeometry(.14,10,10),new THREE.MeshBasicMaterial({color:C[v]}));m.position.set(Math.cos(t)*r*2.1,y*2.1,Math.sin(t)*r*2.1);g.add(m)});
+let d=false,px=0,vx=0;el.onpointerdown=e=>{d=true;px=e.clientX;vx=0};addEventListener('pointerup',()=>d=false);el.onpointermove=e=>{if(d){vx=(e.clientX-px)*.01;px=e.clientX;g.rotation.y+=vx}};
+g.rotation.x=.3;(function a(){if(!d)g.rotation.y+=.008;GR.render(sc,cam);GA=requestAnimationFrame(a)})()}
+const sw=(k,t)=>`<label class="flex justify-between items-center py-3 border-b border-white/10"><span>${t}</span><input type="checkbox" style="width:auto" ${CFG[k]?'checked':''} onchange="setC('${k}',this.checked)"></label>`;
+const sel=(k,t,o)=>`<div class="py-3 border-b border-white/10"><div class="mb-1">${t}</div><select onchange="setC('${k}',+this.value)">${o.map(([v,l])=>`<option value="${v}" ${CFG[k]==v?'selected':''}>${l}</option>`).join('')}</select></div>`;
+function openSt(){const P=prof(),u=S.user||{name:'Guest',cls:'9th'};
+const rows=[['acc','👤','#3b82f6','My Account'],['app','🎨','#ec4899','Appearance'],['snd','🔔','#ef4444','Notifications & Sounds'],['qz','📝','#f59e0b','Quiz Settings'],['prv','🔒','#22c55e','Privacy'],['dat','💾','#06b6d4','Data & Storage'],['abt','ℹ️','#8b5cf6','About SYMEEE']];
+$('st').innerHTML=`<div class="glass p-5 text-center mb-3"><div class="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black" style="background:linear-gradient(135deg,var(--a1),var(--a2))">${CFG.av||E((u.name[0]||'S').toUpperCase())}</div><div class="font-bold text-lg mt-2">${E(u.name)}</div><div class="text-xs opacity-70">Class ${u.cls} • Level ${Math.floor(P.xp/100)+1} • ${P.xp} XP</div></div>
+<div class="glass overflow-hidden mb-3">${rows.map(r=>`<div class="flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-white/10" onclick="openSet('${r[0]}')"><span class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:${r[2]}">${r[1]}</span><span class="flex-1">${r[3]}</span><span class="opacity-50">›</span></div>`).join('')}</div>
+<div class="glass px-4 py-3 text-red-400 cursor-pointer" onclick="logout()">🚪 Log Out</div>`;show('st')}
+function openSet(k){const u=S.user||{name:'Guest',cls:'9th',roll:''};const T={
+acc:['My Account',`<select class="mb-2" onchange="setC('av',this.value)">${['','😀','😎','🦊','🐼','🚀','🎓'].map(a=>`<option value="${a}" ${CFG.av==a?'selected':''}>${a||'Avatar: Initial'}</option>`).join('')}</select><input id="sn" value="${E(u.name)}" class="mb-2"><select id="sc2" class="mb-2">${['9th','10th','11th','12th'].map(c=>`<option ${c==u.cls?'selected':''}>${c}</option>`).join('')}</select><input id="sr" value="${E(u.roll||'')}" placeholder="Roll No" class="mb-2"><button class="btn w-full" onclick="saveAcc()">Save</button>`],
+app:['Appearance',`<div class="mb-2">Accent Color</div><div class="flex gap-3 mb-4">${Object.keys(ACC).map(a=>`<button onclick="setC('acc','${a}');openSet('app')" class="w-10 h-10 rounded-full ${CFG.acc==a?'ring-2 ring-white':''}" style="background:linear-gradient(135deg,${ACC[a][0]},${ACC[a][1]})"></button>`).join('')}</div>`+sel('fs','Text Size',[[14,'Small'],[16,'Normal'],[19,'Large']])+sw('light','☀️ Light theme')],
+snd:['Notifications & Sounds',sw('sound','🔊 Answer sounds')+sw('vib','📳 Vibration')+sw('rem','📢 Daily practice reminder')],
+qz:['Quiz Settings',sel('tpq','⏱ Time per question',[[0,'No timer'],[30,'30 sec'],[60,'1 min'],[90,'1.5 min'],[120,'2 min']])+sw('neg','➖ Negative marking (−0.25)')+sw('shuf','🔀 Shuffle by default')+sw('auto','⏭ Auto-next in practice')+sel('goal','🎯 Daily goal (questions)',[[5,'5'],[10,'10'],[20,'20'],[50,'50']])],
+prv:['Privacy',sw('hide','🙈 Hide me from leaderboard')+'<p class="text-xs opacity-60 mt-2">Leaderboard sirf is device ka hota hai.</p>'],
+dat:['Data & Storage','<button class="btn alt w-full mb-2" onclick="expMe()">📤 Export my progress</button><button class="btn alt w-full mb-2" onclick="if(confirm(\'History clear?\')){sv(\'sy_hist\',[]);alert(\'Done\')}">🧹 Clear history</button><button class="btn alt w-full" style="color:#f87171" onclick="if(confirm(\'Sab kuch reset? (quizzes bhi)\')){localStorage.clear();location.reload()}">⚠️ Reset everything</button>'],
+abt:['About SYMEEE','<p class="text-sm">SYMEEE v4.0 — Quiz app for 9th–12th.<br>Created by Khushbu | Founder &amp; Educator - SYMEEE Classes</p>']};
+$('sp').innerHTML=`<div class="glass p-4"><button class="text-sm mb-2" onclick="openSt()">← Settings</button><h2 class="font-bold text-lg mb-2">${T[k][0]}</h2>${T[k][1]}</div>`;show('sp')}
+function saveAcc(){S.user={name:$('sn').value.trim()||S.user?.name||'Guest',cls:$('sc2').value,roll:$('sr').value.trim()};sv('sy_user',S.user);alert('Saved ✅');openSt()}
+function expMe(){const n=S.user?.name,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({user:S.user,stats:prof(),history:ld('sy_hist',[]).filter(h=>h.name==n)},null,1)],{type:'application/json'}));a.download='symeee-my-progress.json';a.click()}
+
+/* quiz-app extras */
+const pk=()=>'sy_p_'+(S.user?.name||'Guest'),prof=()=>ld(pk(),{xp:0,streak:0,n:0,best:0,last:''}),savep=p=>sv(pk(),p);
+
+let AC;function beep(ok){if(!CFG.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.frequency.value=ok?880:200;g.gain.value=.1;o.start();o.stop(AC.currentTime+.15)}catch(e){}}
+function pick(k){if(S.prac&&S.ans[S.i]>=0)return;S.ans[S.i]=k;if(S.prac){const c=k==S.quiz.qs[S.i].a;beep(c);if(CFG.vib&&navigator.vibrate)navigator.vibrate(c?30:[60,40,60]);if(CFG.auto&&S.i<S.quiz.qs.length-1){const i=S.i;setTimeout(()=>{if(S.i==i&&$('qz').classList.contains('on'))nav(1)},1100)}}draw()}
+function quick(){const qs=Q().filter(q=>q.cls==S.cls).flatMap(q=>q.qs);if(!qs.length)return alert('Is class me abhi koi question nahi.');startQ(0,{id:'quick',cls:S.cls,sub:'Mix',title:'Quick Mix',qs:qs.sort(()=>Math.random()-.5).slice(0,10)},1)}
+function retry(){S.quiz.id=='quick'?startQ(0,S.quiz,S.prac):startQ(S.quiz.id,0,S.prac)}
+function retryWrong(){const w=S.quiz.qs.filter((q,i)=>S.ans[i]!=q.a);if(!w.length)return alert('Sab sahi! 🎉');startQ(0,{id:'quick',cls:S.quiz.cls,sub:S.quiz.sub,title:'Wrong Revision',qs:w},1)}
+function share(){if(navigator.share)navigator.share({text:S.share}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(S.share);alert('Copied!')}}
+
+/* v4 extras */
+const QT=['Padhai ek din me nahi hoti, roz thoda karo 💪','Galti = seekhna. Try again! 🔁','Aaj ka 1 test, kal ke 100 marks 🚀','Practice makes perfect ✨','Focus karo, result aayega 🎯','Top karna hai? Streak mat todo 🔥'];
+const todayQ=()=>ld('sy_hist',[]).filter(h=>h.name==S.user?.name&&h.date==new Date().toLocaleDateString()).reduce((a,h)=>a+h.total,0);
+const dx1=()=>(CFG.rem&&!todayQ()?'<div class="glass p-3 mb-3 text-sm">📢 Aaj abhi tak practice nahi ki — chalo ek quick test!</div>':'')+`<div class="text-xs opacity-70 mb-3 px-1">💬 ${QT[new Date().getDate()%QT.length]}</div>`;
+const dx2=()=>(ld('sy_resume',null)?'<button class="btn w-full mt-3" onclick="resume()">▶ Resume last test</button>':'')+`<button class="btn alt w-full mt-2" onclick="showBm()">⭐ Saved Questions (${ld('sy_bm',[]).length})</button>`;
+function resume(){const r=ld('sy_resume',null);if(!r)return;Object.assign(S,{quiz:r.quiz,ans:r.ans,i:r.i,t:r.t,prac:r.prac,fl:r.fl||[],hid:r.hid||{},ll:r.ll||{f:1,t:1}});clearInterval(S.iv);S.iv=setInterval(()=>{S.t--;tick();if(S.t<=0)submit()},1000);show('qz');draw();tick()}
+function ll5050(){if(!S.ll.f)return alert('50:50 ek hi baar milta hai');if(S.ans[S.i]>=0)return;const q=S.quiz.qs[S.i];S.hid[S.i]=[0,1,2,3].filter(k=>k!=q.a).sort(()=>Math.random()-.5).slice(0,2);S.ll.f=0;draw()}
+function llTime(){if(!S.ll.t)return alert('Ek hi baar milta hai');if(S.t>1e8)return;S.t+=30;S.ll.t=0;tick()}
+function bmk(){const q=S.quiz.qs[S.i],l=ld('sy_bm',[]),k=l.findIndex(b=>b.q==q.q);k>=0?l.splice(k,1):l.push({q:q.q,o:q.o,a:q.a,ex:q.ex||'',sub:S.quiz.sub,cls:S.quiz.cls});sv('sy_bm',l);draw()}
+function bmq(i){const q=S.quiz.qs[i],l=ld('sy_bm',[]);if(!l.some(b=>b.q==q.q))l.push({q:q.q,o:q.o,a:q.a,ex:q.ex||'',sub:S.quiz.sub,cls:S.quiz.cls});sv('sy_bm',l);alert('Saved ⭐')}
+function showBm(){const l=ld('sy_bm',[]);$('bk').innerHTML=`<div class="glass p-4"><button class="text-sm mb-2" onclick="show('cls')">← Home</button><h2 class="font-bold text-lg mb-2">⭐ Saved Questions</h2>${l.map((b,i)=>`<div class="bg-white/5 rounded-xl p-3 mb-2 text-sm"><b>${E(b.q)}</b><div class="opacity-60 text-xs">${b.cls} • ${b.sub}</div>${b.o.map((o,k)=>`<div class="${k==b.a?'text-green-300':''}">${'ABCD'[k]}) ${E(o)}</div>`).join('')}${b.ex?`<div class="opacity-80 mt-1">💡 ${E(b.ex)}</div>`:''}<button class="text-xs text-red-300 mt-1" onclick="rmBm(${i})">Remove</button></div>`).join('')||'<p class="text-sm opacity-70">Koi saved question nahi. Quiz me ☆ dabao.</p>'}</div>`;show('bk')}
+function rmBm(i){const l=ld('sy_bm',[]);l.splice(i,1);sv('sy_bm',l);showBm()}
+let wch=null;
+function weekly(me){const ds=[...Array(7)].map((_,i)=>new Date(Date.now()-(6-i)*864e5));if(wch)wch.destroy();
+wch=new Chart($('wc'),{type:'bar',data:{labels:ds.map(d=>d.toLocaleDateString('en',{weekday:'short'})),datasets:[{data:ds.map(d=>me.filter(h=>h.date==d.toLocaleDateString()).reduce((a,h)=>a+h.total,0)),backgroundColor:'#a855f7'}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#c084fc'}},x:{ticks:{color:'#c084fc'}}}}});
+$('sbj').innerHTML=SUBS.map(s=>{const l=me.filter(h=>h.sub==s),p=l.length?Math.round(l.reduce((a,h)=>a+h.pct,0)/l.length):0;return `<div>${s} — ${p}%<div class="h-2 bg-white/10 rounded"><div class="h-2 rounded" style="width:${p}%;background:linear-gradient(90deg,var(--a1),var(--a2))"></div></div></div>`}).join('')}
+function cert(){if(S.res.pct<40)return alert('Certificate ke liye kam se kam 40% chahiye 😊');const c=document.createElement('canvas');c.width=1000;c.height=680;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,1000,680);g.addColorStop(0,'#2a0a3d');g.addColorStop(1,'#7e22ce');x.fillStyle=g;x.fillRect(0,0,1000,680);x.strokeStyle='#ff4ecd';x.lineWidth=8;x.strokeRect(24,24,952,632);x.textAlign='center';
+x.fillStyle='#fff';x.font='700 64px Audiowide,Arial';x.fillText('SYM',410,130);x.fillStyle='#ff4ecd';x.fillText('EEE',600,130);
+x.fillStyle='#fff';x.font='28px Arial';x.fillText('CERTIFICATE OF ACHIEVEMENT',500,210);x.fillText('is proudly presented to',500,270);x.font='italic 700 60px Georgia';x.fillStyle='#f0abfc';x.fillText(S.user?.name||'Student',500,350);
+x.fillStyle='#fff';x.font='26px Arial';x.fillText(`for scoring ${S.res.pct}% (${S.res.ok}/${S.res.total}) in`,500,420);x.font='700 32px Arial';x.fillText(`${S.quiz.cls} • ${S.quiz.sub} • ${S.quiz.title}`,500,470);x.font='20px Arial';x.fillText(new Date().toLocaleDateString(),500,540);x.font='italic 22px cursive';x.fillStyle='#c084fc';x.fillText('Created by Khushbu | Founder & Educator - SYMEEE Classes',500,620);
+const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='SYMEEE-certificate.png';a.click()}
+function csv(){const h=ld('sy_hist',[]),r=[['Name','Class','Subject','Title','Correct','Total','Percent','Date'],...h.map(x=>[x.name,x.cls,x.sub,x.title,x.ok,x.total,x.pct,x.date])].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r],{type:'text/csv'}));a.download='symeee-results.csv';a.click()}
+function dup(id){const l=Q(),q=l.find(x=>x.id==id);l.push({...q,id:'q'+Date.now(),title:q.title+' (copy)'});sv('sy_quizzes',l);listAdmin()}
+addEventListener('keydown',e=>{if(!$('qz').classList.contains('on')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const k='abcd1234'.indexOf(e.key.toLowerCase());if(k>=0)pick(k%4);else if(e.key=='ArrowRight')nav(1);else if(e.key=='ArrowLeft')nav(-1)});
+
+/* v5: app shell */
+function dash(){if(!S.cls)S.cls=S.user?.cls||'9th';
+const P=prof(),lv=Math.floor(P.xp/100)+1,tq=todayQ(),g=CFG.goal,pc=Math.min(100,Math.round(tq/g*100)),
+b=[P.n>=1&&'🎯 First Test',P.best==100&&'💯 Perfect',P.n>=5&&'📚 5 Tests',P.streak>=3&&'🔥 3-Day',P.xp>=500&&'👑 500 XP',P.n>=10&&'🏆 10 Tests',P.xp>=1000&&'🚀 1000 XP',P.streak>=7&&'🌟 7-Day'].filter(Boolean),
+SB={Chemistry:['⚗️','#ec4899','#f97316'],Maths:['📐','#3b82f6','#06b6d4'],Science:['🔬','#22c55e','#14b8a6']};
+$('dash').innerHTML=`<div class="flex items-center justify-between mb-3"><div><div class="text-xs opacity-60">Welcome back 👋</div><div class="text-xl font-extrabold">${E(S.user?.name||'Guest')}</div></div><div class="chip">🔥 ${P.streak} day${P.streak==1?'':'s'}</div></div>${dx1()}
+<div class="hero mb-4"><div class="flex-1"><div class="text-xs opacity-80">LEVEL</div><div class="text-4xl font-black">${lv}</div><div class="h-2 bg-white/25 rounded mt-2"><div class="h-2 rounded bg-white" style="width:${P.xp%100}%"></div></div><div class="text-xs mt-1 opacity-90">${P.xp} XP • ${100-P.xp%100} to next</div></div>
+<div class="relative w-24 h-24"><svg viewBox="0 0 36 36" class="w-24 h-24 -rotate-90"><circle cx="18" cy="18" r="15.9" fill="none" stroke="#fff4" stroke-width="3"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${pc} 100"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center text-xs"><b class="text-lg">${tq}/${g}</b>today</div></div></div>
+<div class="grid grid-cols-3 gap-2 mb-4"><div class="stat"><b>${P.n}</b>Tests</div><div class="stat"><b>${P.best}%</b>Best</div><div class="stat"><b>${b.length}</b>Badges</div></div>
+${ld('sy_resume',null)?'<button class="btn w-full mb-4" onclick="resume()">▶ Resume last test</button>':''}
+<div class="sec">Class</div><div class="flex gap-2 mb-4">${['9th','10th','11th','12th'].map(c=>`<button class="cc ${c==S.cls?'on':''}" onclick="S.cls='${c}';dash()">${c}</button>`).join('')}</div>
+<div class="sec">Subjects</div><div class="grid grid-cols-2 gap-3 mb-4">${SUBS.map(s=>{const n=Q().filter(q=>q.cls==S.cls&&q.sub==s).length,c=SB[s];return `<div class="sc" style="background:linear-gradient(135deg,${c[1]},${c[2]})" onclick="pickS('${s}')"><div class="text-3xl">${c[0]}</div><div class="font-bold mt-2">${s}</div><div class="text-xs opacity-90">${n} test${n==1?'':'s'}</div></div>`}).join('')}<div class="sc" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)" onclick="quick()"><div class="text-3xl">⚡</div><div class="font-bold mt-2">Quick Mix</div><div class="text-xs opacity-90">10 random Qs</div></div></div>
+${b.length?`<div class="sec">Badges</div><div class="flex flex-wrap gap-2 mb-3">${b.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`:''}`}
+function tabs(id){const t=$('tab'),m={cls:0,tl:0,rs:0,hs:2,bk:3,st:4,sp:4},off=!S.user||['login','wel','al','ad','qz'].includes(id);t.style.display=off?'none':'flex';[...t.children].forEach((b,i)=>b.classList.toggle('on',m[id]===i));document.body.style.paddingBottom=off?'16px':'84px';const a=$('av');a.style.display=S.user&&!['login','wel','al'].includes(id)?'flex':'none';a.textContent=CFG.av||(S.user?.name||'S')[0].toUpperCase()}
+function leaveQ(){if(confirm('Test beech me chhodna hai? Baad me Resume kar sakte ho.')){sv('sy_resume',{quiz:S.quiz,ans:S.ans,i:S.i,t:S.t,prac:S.prac,fl:S.fl,hid:S.hid,ll:S.ll});show('cls')}}
+applyCfg();
+/* login extras + history */
+function tab(n){$('p1').classList.toggle('hidden',n!=1);$('p2').classList.toggle('hidden',n!=2);$('t1').classList.toggle('alt',n!=1);$('t2').classList.toggle('alt',n!=2)}
+function guest(){S.user={name:'Guest',cls:'9th',roll:''};show('cls')}
+function logout(){S.user=null;S.admin=false;localStorage.removeItem('sy_user');show('login')}
+async function adminOtp(){const e=$('le').value.trim().toLowerCase(),m=$('lm');if(!ADMINS.includes(e))return m.textContent='Ye email admin list me nahi hai.';if(!sb)return m.textContent='Supabase load nahi hua. Password use karo.';const{error}=await sb.auth.signInWithOtp({email:e});m.textContent=error?error.message:'Code email par bheja gaya.'}
+async function adminVerify(){const e=$('le').value.trim().toLowerCase();if(!sb)return;const{error}=await sb.auth.verifyOtp({email:e,token:$('lk').value.trim(),type:'email'});if(error)return $('lm').textContent=error.message;if(ADMINS.includes(e)){S.admin=true;show('ad')}}
+let hch=null;
+function showHist(){show('hs');const all=ld('sy_hist',[]),me=all.filter(h=>h.name==S.user?.name);
+$('hsum').textContent=me.length?`Tests: ${me.length} • Average: ${Math.round(me.reduce((a,h)=>a+h.pct,0)/me.length)}% • Best: ${Math.max(...me.map(h=>h.pct))}%`:'Abhi tak koi test nahi diya.';
+if(hch)hch.destroy();hch=new Chart($('hc'),{type:'line',data:{labels:me.map((h,i)=>i+1),datasets:[{data:me.map(h=>h.pct),borderColor:'#ec4899',backgroundColor:'#a855f755',fill:true,tension:.3}]},options:{plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{color:'#fff'}},x:{ticks:{color:'#fff'}}}}});
+$('lb').innerHTML=[...all].filter(h=>!h.hide).sort((a,b)=>b.pct-a.pct).slice(0,5).map((h,i)=>`<div class="flex justify-between bg-white/5 rounded-lg px-3 py-1"><span>${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${E(h.name)}</span><span>${h.pct}% • ${E(h.title)}</span></div>`).join('')||'—';
+weekly(me);$('hl').innerHTML=[...me].reverse().map(h=>`<div class="bg-white/5 rounded-lg px-3 py-2 flex justify-between"><span>${E(h.title)}<br><span class="opacity-60 text-xs">${E(h.cls)} ${E(h.sub)} • ${h.date}</span></span><b>${h.ok}/${h.total}</b></div>`).join('')||'—'}
+
+/* admin */
+let taps=0,tt;$('logo').onclick=()=>{taps++;clearTimeout(tt);tt=setTimeout(()=>taps=0,1500);if(taps>=5){taps=0;show(S.admin?'ad':'al')}};
+function adminLogin(id='ap'){if($(id).value==='symeee123'){S.admin=true;$(id).value='';show('ad')}else alert('Wrong password')}
+function parse(t){const out=[],bl=t.split(/(?:^|\n)\s*Q\s*\d*\s*[:.]/i).map(s=>s.trim()).filter(Boolean);
+for(const b of bl){let s=b.replace(/\s+/g,' ');let ex='';const em=s.match(/\s*Exp(?:lanation)?\s*[:\-]\s*(.*)$/i);if(em){ex=em[1];s=s.slice(0,em.index)}const m=s.match(/^(.*?)\s*\(?A[).]\s*(.*?)\s*\(?B[).]\s*(.*?)\s*\(?C[).]\s*(.*?)\s*\(?D[).]\s*(.*?)(?:\s*Ans(?:wer)?\s*[:\-]\s*\(?([A-D])\)?)?\s*$/i);if(!m)continue;
+let o=[m[2],m[3],m[4],m[5]],a=-1;o=o.map((x,i)=>{if(/\*\s*$/.test(x)){a=i;return x.replace(/\s*\*\s*$/,'')}return x});
+if(m[6])a='ABCD'.indexOf(m[6].toUpperCase());if(a<0)continue;out.push({q:m[1],o,a,ex})}return out}
+function makeQuiz(){const raw=$('ax').value,title=$('at').value.trim()||'Untitled Test',qs=parse(raw);if(!qs.length)return alert('Koi valid question nahi mila. Format check karo.');
+const l=Q(),it={id:S.edit||'q'+Date.now(),cls:$('ac').value,sub:$('as').value,title,raw,qs};const k=l.findIndex(x=>x.id==it.id);k>=0?l[k]=it:l.push(it);sv('sy_quizzes',l);alert(`✅ ${qs.length} questions saved!`);clearForm();listAdmin()}
+function clearForm(){S.edit=null;$('ax').value='';$('at').value='';$('qb').textContent='QUIZ BANAO'}
+function listAdmin(){$('adL').innerHTML=Q().map(q=>`<div class="flex justify-between items-center bg-white/5 rounded-xl p-3"><div><b>${E(q.title)}</b><div class="text-xs opacity-70">${q.cls} • ${q.sub} • ${q.qs.length}Q</div></div><div class="flex gap-2"><button class="btn alt" onclick="ed('${q.id}')">Edit</button><button class="btn alt" onclick="dup('${q.id}')">📄</button><button class="btn alt" onclick="del('${q.id}')">🗑</button></div></div>`).join('')||'<div class="text-sm opacity-70">Koi quiz nahi.</div>'}
+function ed(id){const q=Q().find(x=>x.id==id);S.edit=id;$('ac').value=q.cls;$('as').value=q.sub;$('at').value=q.title;$('ax').value=q.raw||q.qs.map(x=>`Q: ${x.q} `+x.o.map((o,i)=>`${'ABCD'[i]}) ${o}${i==x.a?'*':''}`).join(' ')+` Ans: ${'ABCD'[x.a]}`).join('\n');$('qb').textContent='UPDATE QUIZ';window.scrollTo(0,0)}
+function del(id){if(confirm('Delete?')){sv('sy_quizzes',Q().filter(x=>x.id!=id));listAdmin()}}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(Q(),null,1)],{type:'application/json'}));a.download='symeee-quizzes.json';a.click()}
+function imp(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;const m=new Map(Q().map(x=>[x.id,x]));d.forEach(x=>x.id&&x.qs&&m.set(x.id,x));sv('sy_quizzes',[...m.values()]);listAdmin();alert('Imported!')}catch(_){alert('Invalid JSON')}};r.readAsText(f)}
+
+/* Supabase (optional cloud sync) */
+const msg=t=>$('sm').textContent=t;
+async function sbSend(){const e=$('se').value.trim().toLowerCase();if(!ADMINS.includes(e))return msg('Ye email admin list me nahi hai.');const{error}=await sb.auth.signInWithOtp({email:e});msg(error?error.message:'Code email par bheja gaya.')}
+async function sbVerify(){const e=$('se').value.trim().toLowerCase();const{error}=await sb.auth.verifyOtp({email:e,token:$('sk').value.trim(),type:'email'});msg(error?error.message:'✅ Logged in: '+e)}
+async function sbPush(){try{const{data:{session}}=await sb.auth.getSession();if(!session||!ADMINS.includes(session.user.email))return msg('Pehle admin email se verify karo.');
+const rows=Q().map(q=>({id:q.id,data:q}));const{error}=await sb.from('symeee_quizzes').upsert(rows);msg(error?error.message:`⬆ ${rows.length} quizzes pushed`)}catch(e){msg('Error: '+e.message)}}
+async function sbPull(manual){try{const{data,error}=await sb.from('symeee_quizzes').select('id,data');if(error)throw error;if(!data||!data.length)return manual&&msg('Cloud khali hai.');
+const m=new Map(Q().map(x=>[x.id,x]));data.forEach(r=>m.set(r.id,r.data));sv('sy_quizzes',[...m.values()]);manual&&(msg(`⬇ ${data.length} quizzes pulled`),listAdmin())}catch(e){manual&&msg('Error: '+e.message)}}
+if(sb)sbPull(false);
+</script></body></html>
